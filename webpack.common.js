@@ -7,8 +7,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   entry: {
-    main: path.join(__dirname, "src", "index.js"),
-    cms: path.join(__dirname, "src", "js", "cms.js"),
+    main: path.join(__dirname, "src", "index.js")
   },
 
   output: {
@@ -21,12 +20,16 @@ module.exports = {
         test: /\.((png)|(eot)|(woff)|(woff2)|(ttf)|(svg)|(gif))(\?v=\d+\.\d+\.\d+)?$/,
         loader: "file-loader?name=/[hash].[ext]"
       },
+
+      {test: /\.json$/, loader: "json-loader"},
+
       {
         loader: "babel-loader",
         test: /\.js?$/,
         exclude: /node_modules/,
         query: {cacheDirectory: true}
       },
+
       {
         test: /\.(sa|sc|c)ss$/,
         exclude: /node_modules/,
@@ -36,22 +39,22 @@ module.exports = {
   },
 
   plugins: [
+    new webpack.ProvidePlugin({
+      fetch: "imports-loader?this=>global!exports-loader?global.fetch!whatwg-fetch"
+    }),
+
     new AssetsPlugin({
       filename: "webpack.json",
       path: path.join(process.cwd(), "site/data"),
       prettyPrint: true
     }),
+
     new CopyWebpackPlugin([
       {
         from: "./src/fonts/",
         to: "fonts/",
         flatten: true
       }
-    ]),
-    new HtmlWebpackPlugin({
-      filename: 'admin/index.html',
-      template: 'src/cms.html',
-      inject: false,
-    }),
+    ])
   ]
 };
